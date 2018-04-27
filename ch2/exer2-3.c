@@ -1,12 +1,13 @@
 #include <stdio.h>
-#include <ctypes.h>
+#include <ctype.h>
+#include <math.h>
 
 /* htoi - convert hexadecimal string into integer value. */
 
-#define MAXSIZE 18 // maximum length of hex string
+#define MAXSIZE 8 // maximum length of hex string
 
 int getLine(char input[], int maxsize);
-int htoi(char input[], int result);
+int htoi(char input[], int length, int result);
 
 int main()
 {
@@ -17,16 +18,21 @@ int main()
     len = 0;
     result = 0;
 
-    while ((len = getline(input, MAXSIZE)) > 0) {
+    while ((len = getLine(input, MAXSIZE)) > 0) {
         if (len <= MAXSIZE) {
-            printf("%s == %u\n", input, htoi(input, MAXSIZE));
+            printf("%s == %u\n", input, htoi(input, len, MAXSIZE));
+            break;
         } else {
-            printf("input string %s too large\n");
+            printf("input string %s too large\n", input);
+            break;
+        }
+    }
+}
 
 int getLine(char input[], int maxsize)
 {
     int c, i;
-    for (i = 0; i < lim -1 && (c=getchar()) != EOF && c != '\n'; ++i) {
+    for (i = 0; i < maxsize - 1 && (c=getchar()) != EOF && c != '\n'; ++i) {
         if (isalnum(c))
             input[i] = c;
     }
@@ -34,16 +40,28 @@ int getLine(char input[], int maxsize)
     return i;
 }
 
-int htoi(char input[], int result)
-/* assume input contains something 0x1111111 */
+int htoi(char input[], int length, int result)
+/* assume input contains something like 0x1111111 */
 {
-    int i;
-    for (i = 0; i < MAXSIZE; ++i) {
-        if (i < 2 && input[0] == '0' && (input[1] == 'x' || input[1] == 'X')) // skip optional prefix
+    int i, j, digit, value;
+    result = 0;
+    //printf("htoi length = %d\n", length);
+    for (i = length - 1; i < MAXSIZE; --i) {
+        value = 0;
+        if (i < 2 && (input[0] == '0' && (input[1] == 'x' || input[1] == 'X'))) // skip optional prefix
             continue; 
-        if (isdigit(input[i]))
-            result += input[i] - '0';
-        if (isalpha(input[i]))
-            result += tolower(input[i]) - 'a';
+        if (isdigit(input[i])) {
+            digit = input[i] - '0';
+            value = pow(16, length - i - 1);
+            result += (value * digit);
+            //printf("digit = %d, value = %d, result = %d, i = %d\n", digit, value, result, i);
+        }
+        if (isalpha(input[i])) {
+            digit = tolower(10 + input[i]) - 'a';
+            value = pow(16, length - i - 1);
+            result += (value * digit);
+            //printf("digit = %d, value = %d, result = %d, i = %d\n", digit, value, result, i);
+        }
+    }
     return result;
 }
