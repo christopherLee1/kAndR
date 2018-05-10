@@ -7,29 +7,22 @@ void expand (char s1[], char s2[]);
 /* expands shorthand like a-z into abc..xyz */
 void expand (char s1[], char s2[])
 {
-    int i, j, temp, rStart, rEnd, seps, len;
+    int i, j, temp, rStart, rEnd, len;
     rStart = rEnd = -1;
-    seps = len = 0;
+    len = 0;
     for (i = 0,j = 0; s1[i] != '\0'; i++) {
-        //printf("s1[%d] = %c\n", i, s1[i]);
         if (s1[i] == '-')
             continue;
         else if (rStart == -1) {
-            //printf("setting rStart to %c\n", s1[i]);
             rStart = s1[i];
         } else if (rEnd == -1 && s1[i+1] != '-') {
-            //printf("setting rEnd to %c\n", s1[i]);
             rEnd = s1[i];
         }
         if ((rStart > -1) && (rEnd > -1)) {
-            //printf("%c\n", rStart);
-            //printf("%c\n", rEnd);
             for (j = 0; j <= rEnd-rStart; j++) {
                 s2[len] = rStart + j;
                 ++len;
             }
-            //printf("j = %d\n", j);
-            //printf("s2: %s\n", s2);
             rStart = rEnd = -1;
         }
     }
