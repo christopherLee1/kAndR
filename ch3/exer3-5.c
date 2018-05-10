@@ -27,8 +27,6 @@ void itob (int n, char s[], int b)
         pos = n;
     i = 0;
     do {
-        printf("pos = %u, mod  %d = %u\n", pos, b, pos % b);
-        //printf("s[%d] = %c\n", i, pos % b + '0');
         if (pos % b < 10)
             s[i++] = '0' + pos % b;
         else
@@ -42,9 +40,9 @@ void itob (int n, char s[], int b)
 
 int main()
 {
-    int n = 25;
+    int n = 16;
     char s[128];
-    int b = 8;
+    int b = 17;
     itob(n, s, b);
     printf("n = %d, s = %s\n", n, s);
 }
