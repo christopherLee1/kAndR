@@ -10,11 +10,11 @@ char pattern[] = "ould"; /* patter to search for */
 int main()
 {
     char line[MAXLINE];
-    int found = 0;
+    int index, found = 0;
 
     while (getLine(line, MAXLINE) > 0)
-        if (strindex2(line, pattern) >= 0) {
-            printf("%s", line);
+        if ((index = strindex2(line, pattern)) >= 0) {
+            printf("%s found at index %d of %s", pattern, index, line);
             found++;
         }
     return found;
@@ -36,13 +36,14 @@ int getLine(char s[], int lim)
 /* strindex2: return rightmost index of t in s, -1 if none */
 int strindex2(char s[], char t[])
 {
-    int i, j, k;
+    int i, j, k, l;
     for (i = 0; s[i] != '\0'; i++) {
-        for (j=i, k=0; t[k] != '\0' && s[j]==t[k]; j++, k++)
+        for (j=i, k=0; t[k] != '\0' && s[j]==t[k]; j++, k++) {
             ;
-        if (k > 0 && t[k] == '\0')
-            printf("found %s at position %d\n", pattern, i);
-            return i;
+        }
+        if (k > 0 && t[k] == '\0') {
+            l = i;
+        }
     }
-    return -1;
+    return (l >= 0) ? l : -1;
 }
