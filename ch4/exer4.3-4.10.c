@@ -8,11 +8,16 @@
 int getop(char []);
 void push(double);
 double pop(void);
+void print(void);
+void swap(void);
+void duplicate(void);
+void clear(void);
+void printAll(void);
 
 /* reverse Polish calculator */
 int main()
 {
-    int type;
+    int type, i;
     double op2;
     char s[MAXOP];
 
@@ -45,8 +50,22 @@ int main()
                 else
                     printf("error: modulo 0\n");
                 break;
+            case 'p': //print top of stack without popping
+                print();
+                break;
+            case's': // swap top two elems
+                swap();
+                break;
+            case 'd': // duplicate top elem and add it back
+                duplicate();
+                break;
+            case 'c': // clear the stack
+                clear();
+                break;
+            case 'a': // print the whole stack
+                printAll();
+                break;
             case '\n':
-                printf("\t%.8g\n", pop());
                 break;
             default:
                 printf("error: unknown command %s\n", s);
@@ -59,6 +78,7 @@ int main()
 #define MAXVAL 100 /* max of depth of val stack */
 
 int sp = 0;
+double elem1, elem2;
 double val[MAXVAL];
 
 /* push: push f onto value stack */
@@ -79,6 +99,46 @@ double pop(void)
         printf("error: stack empty\n");
         return 0.0;
     }
+}
+
+/* print: print top item without removing it */
+void print(void)
+{
+    elem1 = pop();
+    printf("\t%.8g\n", elem1);
+    push(elem1);
+}
+
+/* swap top two elems of stack */
+void swap(void)
+{
+    elem1 = pop();
+    elem2 = pop();
+    push(elem1);
+    push(elem2);
+}
+
+/* duplicate: add top of stack to top of stack */
+void duplicate(void)
+{
+    elem1 = pop();
+    push(elem1);
+    push(elem1);
+}
+
+/* clear: clear stack */
+void clear(void)
+{
+    sp = 0;
+}
+
+/* printAll: print each item in stack space separated */
+void printAll(void)
+{
+    int i;
+    for (i = 0; i < sp; i++)
+        printf("%.8g ", val[i]);
+    printf("\n");
 }
 
 #include <ctype.h>
@@ -105,6 +165,8 @@ int getop(char s[])
             ;
     if (c == '-') {// negative number
         s[i] = c;
+        if ((c = getch()) == ' ' || c == '\t' || c == '\n')
+            return '-';
         while (isdigit(s[++i] = c = getch()))
             ;
     }
