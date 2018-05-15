@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdio.h>
+#include <math.h>
 
 /* Find ranges of certain types, exclude calculation for longs
    because the calculation takes forever. */
