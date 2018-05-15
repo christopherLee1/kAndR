@@ -50,6 +50,15 @@ int main()
                 else
                     printf("error: modulo 0\n");
                 break;
+            case '^':
+                push(pow(pop(), pop()));
+                break;
+            case 'e':
+                push(exp(pop()));
+                break;
+            case '@':
+                push(sin(pop()));
+                break;
             case 'p': //print top of stack without popping
                 print();
                 break;
