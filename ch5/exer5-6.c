@@ -1,5 +1,18 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h> // for strlen only
+
+int getLine(char *s, int lim)
+{
+int c;
+char *p = s; // need this pointer so s still points to the beginning
+while (--lim > 0 && (c=getchar()) != EOF && c != '\n')
+    *p++ = c;
+if (c == '\n')
+    *p++ = c;
+*p = '\0';
+return p-s;
+}
 
 /* atoi with pointers */
 int atoi1(char *s)
@@ -37,6 +50,8 @@ for (i = 0; *s != '\0'; s++, i++)
 return -1;
 }
 
+#define MAXLINE 1000
+
 int main()
 {
     // strindex test
@@ -44,6 +59,17 @@ int main()
     //char *t = "negative";
     //printf("strindex(%s,%s): %d, should be 8\n", s, t, strindex(s,t));
 
-    char *s = "123456";
-    printf("atoi(%s) = %d\n", s, atoi1(s));
+    // atoi test
+    //char *s = "123456";
+    //printf("atoi(%s) = %d\n", s, atoi1(s));
+
+    // getline test
+    int len, i;
+    char s[MAXLINE];
+    while ((len = getLine(s, MAXLINE)) > 0)
+    {
+        for  (i = 0; i < len/2; i++) // only print half the line as a simple test
+            printf("%c", s[i]);
+        printf("\n");
+    }
 }
