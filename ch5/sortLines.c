@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #define MAXLINES 5000 /* max lines to be sorted */
 #define ALLOCSIZE 10000
@@ -33,10 +34,14 @@ if (p >= allocbuf && p < allocbuf + ALLOCSIZE)
 int main()
 {
     int nlines; /* num input lines to read */
+    clock_t start, end;
+    start = clock();
     if ((nlines = readlines(lineptr, MAXLINES)) >= 0)
     {
         qsort(lineptr, 0, nlines-1);
         writelines(lineptr, nlines);
+        end = clock() - start;
+        printf("qsort took %fs\n", (double)end/CLOCKS_PER_SEC);
         return 0;
     } else {
         printf("error: input too big to sort\n");
