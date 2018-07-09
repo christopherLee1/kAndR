@@ -1,14 +1,14 @@
 #include "ch5Code.h"
 
 #define DEFAULT_LINES 5
-#define MAXLINES 5000
+//#define MAXLINES 5000
 
 char *lineptr[MAXLINES];
 
 /* transforms string into integer representation */
 int toint(char *c)
 {
-int i, ret = 0;
+int i = 0, ret = 0;
 for (i = strlen(c)-1; i >= 0; i--)
     {
     if (c[i] == '-')

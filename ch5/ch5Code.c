@@ -146,6 +146,14 @@ int readlines(char *lineptr[], int maxlines)
     return nlines;
 }
 
+/* writelines: write output lines to stdout */
+void writelines(char *lineptr[], int nlines)
+{
+    int i;
+    for (i = 0; i < nlines; i++)
+        printf("%s\n", lineptr[i]);
+}
+
 /*
 #define SIZE 10
 

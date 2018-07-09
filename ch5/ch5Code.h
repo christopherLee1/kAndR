@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define ALLOCSIZE 10000 /* size of available space */
 
@@ -41,8 +42,13 @@ int getch(void); /* get a (possibly pushed back) character */
 /* getLine: read at most lim chars into s */
 int getLine(char *s, int lim);
 
+#define MAXLINES 5000
+
 /* readlines: read input lines */
 int readlines(char *lineptr[], int maxlines);
+
+/* writelines: write output lines to stdout */
+void writelines(char *lineptr[], int nlines);
 
 void ungetch(int c); /* push character back on input */
 
