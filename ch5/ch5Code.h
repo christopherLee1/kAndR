@@ -4,8 +4,8 @@
 
 #define ALLOCSIZE 10000 /* size of available space */
 
-static char allocbuf[ALLOCSIZE]; /* storage for alloc */
-static char *allocp = allocbuf; /* next free position */
+//static char allocbuf[ALLOCSIZE]; /* storage for alloc */
+//static char *allocp = allocbuf; /* next free position */
 
 char *alloc(int n); /* return pointer to n characters */
 
@@ -31,10 +31,18 @@ int getint(int *pn);
 
 #define BUFSIZE 100
 
-char buf[BUFSIZE]; // buffer for ungetch
-int bufp = 0; // next free position in buf
+//char buf[BUFSIZE]; // buffer for ungetch
+//int bufp = 0; // next free position in buf
 
 int getch(void); /* get a (possibly pushed back) character */
+
+#define MAXLEN 1000 /* max length of single line */
+
+/* getLine: read at most lim chars into s */
+int getLine(char *s, int lim);
+
+/* readlines: read input lines */
+int readlines(char *lineptr[], int maxlines);
 
 void ungetch(int c); /* push character back on input */
 

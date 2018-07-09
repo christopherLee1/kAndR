@@ -1,7 +1,8 @@
 #include <ctype.h>
 #include <stdio.h>
+#include "ch5Code.h"
 
-#define ALLOCSIZE 10000 /* size of available space */
+//#define ALLOCSIZE 10000 /* size of available space */
 
 static char allocbuf[ALLOCSIZE]; /* storage for alloc */
 static char *allocp = allocbuf; /* next free position */
@@ -109,6 +110,43 @@ else
     buf[bufp++] = c;
 }
 
+//#define MAXLEN 1000 /* max length of single line */
+
+/* getLine: read at most lim chars into s */
+int getLine(char *s, int lim)
+{
+int c;
+char *p = s; // need this pointer so s still points to the beginning
+while (--lim > 0 && (c=getchar()) != EOF && c != '\n')
+    *p++ = c;
+if (c == '\n')
+    *p++ = c;
+*p = '\0';
+return p-s;
+}
+
+/* readlines: read input lines */
+int readlines(char *lineptr[], int maxlines)
+{
+    int len, nlines;
+    char *p, line[MAXLEN];
+
+    nlines = 0;
+    while ((len = getLine(line, MAXLEN)) > 0)
+        if (nlines >= maxlines || (p = alloc(len)) == NULL)
+            return -1;
+        else {
+            line[len-1] = '\0'; /* delete newline */
+            strcpy(p, line);
+            lineptr[nlines++] = p;
+        }
+    if (p != NULL)
+        //printf("freeing p\n");
+        afree(p);
+    return nlines;
+}
+
+/*
 #define SIZE 10
 
 int main()
@@ -120,4 +158,4 @@ printf("array: ");
 for (n = 0; n < SIZE; n++)
     printf("%d ", array[n]);
 printf("\n");
-}
+}*/
