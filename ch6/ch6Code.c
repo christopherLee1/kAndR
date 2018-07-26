@@ -108,6 +108,7 @@
 //    int count;
 //} keytab[NKEYS];
 
+/*
 struct key keytab[] =
 {
     {"auto" , 0},    {"break" , 0},   {"case" , 0},    {"char" , 0},
@@ -119,6 +120,7 @@ struct key keytab[] =
     {"struct" , 0},  {"switch" , 0},  {"typedef" , 0}, {"union" , 0},
     {"unsigned" , 0},{"void" , 0},    {"volatile" , 0},{"while" , 0}
 };
+*/
 
 int binsearch (char *word, struct key tab[], int n)
 /* binsearch: find word in tab[0] ... tab[n-1] */
