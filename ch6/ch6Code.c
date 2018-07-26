@@ -122,6 +122,82 @@ struct key keytab[] =
 };
 */
 
+// initialize globals for not looking for keywords
+int inStr = FALSE;
+int inUnderscore = FALSE;
+int singleLineComment = FALSE;
+int multiLineComment = FALSE;
+int inPreproc = FALSE;
+
+int endsWith(char *suf, char *word)
+/* check if last strlen(suf) chars of word == pre */
+{
+int len = strlen(suf);
+int i;
+if (len > strlen(word))
+    return FALSE;
+for (i = 0; i < len; ++i)
+    if (word[strlen(word)-len+i] != suf[i])
+        return FALSE;
+return TRUE;
+}
+
+int startsWith(char *pre, char *word)
+/* check if first strlen(pre) chars of word == pre */
+{
+int len = strlen(pre);
+int i;
+if (len > strlen(word))
+    return FALSE;
+for (i = 0; i < len; ++i)
+    {
+    if (word[i] != pre[i])
+        return FALSE;
+    }
+return TRUE;
+}
+
+int checkAllowed(char c, char *word)
+/* check if c is ",',_,/, or # 
+   used to prevent checking for C keywords in these lines */
+{
+if (c == '\n')
+    {
+    inUnderscore = FALSE; //can't have varNames split over two lines
+    inPreproc  = FALSE;  //explicitly don't allow split preprocessor lines with '\'
+    singleLineComment = FALSE;
+    //return ALLOWED;
+    }
+else if (c == '"' || c == '\'')
+    {
+    inStr = !inStr; // toggle based on whether we are closing or opening a new string constant
+    //printf("inStr = %d because word = (%s)\n", inStr, word);
+    }
+else if (c == '_')
+    {
+    inUnderscore = !inUnderscore;
+    }
+else if (c == '/')
+    {
+    if (startsWith(word, "//"))
+        {
+        printf("startswith // true\n");
+        singleLineComment = TRUE;
+        }
+    else if (startsWith(word, "*"))
+        multiLineComment = TRUE;
+    else if (endsWith(word, "*/"))
+        multiLineComment = FALSE;
+    //printf("inComment = %d because word = (%s)\n" , inComment, word);
+    }
+else if (c == '#')
+    {
+    inPreproc = TRUE;
+    }
+printf("ALLOWED : inStr = %d, sLComment = %d, mLComment = %d, inUnderscore = %d, inPreproc = %d\n", inStr, singleLineComment, multiLineComment, inUnderscore, inPreproc);
+return ALLOWED;
+}
+
 int binsearch (char *word, struct key tab[], int n)
 /* binsearch: find word in tab[0] ... tab[n-1] */
 {
