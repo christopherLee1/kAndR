@@ -13,7 +13,7 @@ struct key
 #define TRUE 1
 #define FALSE 0
 
-// globals for not looking for keywords
+// globals signifying not check for keywords in this line
 int inStr; //= FALSE;
 int inUnderscore; // = FALSE;
 int singleLineComment; // = FALSE;

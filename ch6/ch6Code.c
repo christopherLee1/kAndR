@@ -129,9 +129,10 @@ int singleLineComment = FALSE;
 int multiLineComment = FALSE;
 int inPreproc = FALSE;
 
-int endsWith(char *suf, char *word)
-/* check if last strlen(suf) chars of word == pre */
+int endsWith(char *word, char *suf)
+/* check if last strlen(suf) chars of word == suf */
 {
+//printf("checking suf=%s against word=%s\n", suf, word);
 int len = strlen(suf);
 int i;
 if (len > strlen(word))
@@ -142,9 +143,10 @@ for (i = 0; i < len; ++i)
 return TRUE;
 }
 
-int startsWith(char *pre, char *word)
+int startsWith(char *word, char *pre)
 /* check if first strlen(pre) chars of word == pre */
 {
+//printf("checking pre=%s against word=%s\n", pre, word);
 int len = strlen(pre);
 int i;
 if (len > strlen(word))
@@ -161,6 +163,7 @@ int checkAllowed(char c, char *word)
 /* check if c is ",',_,/, or # 
    used to prevent checking for C keywords in these lines */
 {
+//printf("checking if %c is allowed in %s\n", c, word);
 if (c == '\n')
     {
     inUnderscore = FALSE; //can't have varNames split over two lines
@@ -184,7 +187,7 @@ else if (c == '/')
         printf("startswith // true\n");
         singleLineComment = TRUE;
         }
-    else if (startsWith(word, "*"))
+    else if (startsWith(word, "/*"))
         multiLineComment = TRUE;
     else if (endsWith(word, "*/"))
         multiLineComment = FALSE;

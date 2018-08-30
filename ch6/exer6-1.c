@@ -39,6 +39,7 @@ for ( ; --lim > 0; w++)
         }
     }
 *w = '\0';
+//printf("strlen(word) = %d\n", strlen(word));
 return word[0];
 }
 
@@ -48,8 +49,8 @@ int n;
 char word[MAXWORD];
 int sum = 0;
 while (getword2(word, MAXWORD) != EOF)
-    printf("found word=(%s)\n", word);
     {
+    printf("found word=(%s)\n", word);
     if (isalpha(word[0]) && ALLOWED)
         {
         if ((n = binsearch(word, keytab, NKEYS)) >= 0)
