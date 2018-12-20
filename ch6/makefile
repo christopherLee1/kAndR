@@ -12,7 +12,7 @@ all: exer6-1
 exer6-1: $(OBJ1)
 	$(CC) -o $@ $^ $(FLAGS)
 
-test:
+test: all
 	@cat test.txt | ./exer6-1
 	@printf "result should be 1\n"
 

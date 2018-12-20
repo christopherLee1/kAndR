@@ -12,37 +12,6 @@ struct key keytab[] =
     {"unsigned" , 0},{"void" , 0},    {"volatile" , 0},{"while" , 0}
 };
 
-int getword2 (char *word, int lim)
-/* better getword: get next word or character from input, and deal with underscores,
-   string constants, comments and single line only preprocessor statements */
-{
-int c;
-char *w = word;
-
-while (isspace(c = getch()))
-    checkAllowed(c, word);
-if (c != EOF)
-    *w++ = c;
-if (!isalpha(c))
-    {
-    checkAllowed(c,word);
-    *w = '\0';
-    return c;
-    }
-for ( ; --lim > 0; w++)
-    {
-    checkAllowed(c,word);
-    if (!isalnum(*w = getch()))
-        {
-        ungetch(*w);
-        break;
-        }
-    }
-*w = '\0';
-//printf("strlen(word) = %d\n", strlen(word));
-return word[0];
-}
-
 int main()
 {
 int n;
@@ -50,11 +19,12 @@ char word[MAXWORD];
 int sum = 0;
 while (getword2(word, MAXWORD) != EOF)
     {
-    printf("found word=(%s)\n", word);
-    if (isalpha(word[0]) && ALLOWED)
+    if (isalpha(word[0]))
         {
         if ((n = binsearch(word, keytab, NKEYS)) >= 0)
+            {
             keytab[n].count++;
+            }
         }
     }
 for (n = 0; n < NKEYS; n++)

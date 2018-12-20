@@ -27,12 +27,15 @@ int inPreproc; // = FALSE;
 
 #define BUFSIZE 100
 
+int prevChar(char *word, char prev);
+/* check if previous character in word is prev */
+
 int startsWith(char *pre, char *word);
 /* check if first strlen(pre) chars of word == pre */
 
-int checkAllowed(char c, char *word);
-/* check if c is ",',_,/, or # 
-   used to prevent checking for C keywords in these lines */
+int getword2 (char *word, int lim);
+/* better getword that ignores preprocessor statements,
+comments and _ in var names */
 
 int binsearch(char *, struct key [], int);
 /* binsearch: find word in tab[0] ... tab[n-1] */

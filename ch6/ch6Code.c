@@ -129,6 +129,13 @@ int singleLineComment = FALSE;
 int multiLineComment = FALSE;
 int inPreproc = FALSE;
 
+int prevChar(char *word, char prev)
+/* check if previous character in word is prev */
+{
+int len = strlen(word);
+return prev == word[len-1];
+}
+
 int endsWith(char *word, char *suf)
 /* check if last strlen(suf) chars of word == suf */
 {
@@ -159,46 +166,74 @@ for (i = 0; i < len; ++i)
 return TRUE;
 }
 
-int checkAllowed(char c, char *word)
-/* check if c is ",',_,/, or # 
-   used to prevent checking for C keywords in these lines */
+int getword2 (char *word, int lim)
+/* better getword: get next word or character from input, and deal with underscores,
+   string constants, comments and single line only preprocessor statements */
 {
-//printf("checking if %c is allowed in %s\n", c, word);
-if (c == '\n')
+int c;
+char *w = word;
+
+while (isspace(c = getch()))
+    ;
+if (c != EOF)
+    *w++ = c;
+if (c == '"') //jump to end of string
     {
-    inUnderscore = FALSE; //can't have varNames split over two lines
-    inPreproc  = FALSE;  //explicitly don't allow split preprocessor lines with '\'
-    singleLineComment = FALSE;
-    //return ALLOWED;
+    for (; --lim > 0; w++)
+        if ((*w = getch()) == '"')
+            {
+            *++w = '\0';
+            return word[0];
+            }
     }
-else if (c == '"' || c == '\'')
+else if (c == '/') //check for comments
     {
-    inStr = !inStr; // toggle based on whether we are closing or opening a new string constant
-    //printf("inStr = %d because word = (%s)\n", inStr, word);
-    }
-else if (c == '_')
-    {
-    inUnderscore = !inUnderscore;
-    }
-else if (c == '/')
-    {
-    if (startsWith(word, "//"))
+    c = getch();
+    if (c == '/')
         {
-        printf("startswith // true\n");
-        singleLineComment = TRUE;
+        *w++ = c;
+        for (; --lim > 0; w++)
+            if ((*w = getch()) == '\n')
+                break;
+        *w++ = '\0';
+        return word[0];
         }
-    else if (startsWith(word, "/*"))
-        multiLineComment = TRUE;
-    else if (endsWith(word, "*/"))
-        multiLineComment = FALSE;
-    //printf("inComment = %d because word = (%s)\n" , inComment, word);
+    else if (c == '*')
+        {
+        *w++ = c;
+        for (; --lim > 0; w++)
+            if ((*w = getch()) == '*')
+                if ((*w = getch()) == '/')
+                    break;
+        *w++ = '\0';
+        return word[0];
+        }
     }
-else if (c == '#')
+else if (c == '#') //jump to end of line
     {
-    inPreproc = TRUE;
+    for (; --lim > 0; w++)
+        if ((*w = getch()) == '\n')
+            break;
+    *w++ = '\0';
+    return word[0];
     }
-printf("ALLOWED : inStr = %d, sLComment = %d, mLComment = %d, inUnderscore = %d, inPreproc = %d\n", inStr, singleLineComment, multiLineComment, inUnderscore, inPreproc);
-return ALLOWED;
+for ( ; --lim > 0; w++)
+    {
+    if (!isalnum(*w = getch()))
+        {
+        if (*w == '_')
+            continue;
+        else if (*w == EOF)
+            return EOF;
+        else
+            {
+            ungetch(*w);
+            break;
+            }
+        }
+    }
+*w = '\0';
+return word[0];
 }
 
 int binsearch (char *word, struct key tab[], int n)
@@ -208,7 +243,7 @@ int cond;
 int low, high, mid;
 low = 0;
 high = n - 1;
-while (low <= high) 
+while (low <= high)
     {
     mid = (low + high) / 2;
     if ((cond = strcmp(word, tab[mid].word)) < 0)
