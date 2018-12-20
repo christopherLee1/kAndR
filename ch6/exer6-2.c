@@ -13,25 +13,25 @@ struct key keytab[] =
     };
 
 int main()
+/* sort variable names that share the first 6 letters */
 {
-struct key *p;
+struct tnode *root;
 char word[MAXWORD];
-int sum = 0;
-
+char buf[7];
+struct key *p;
+int nameSize;
+root = NULL;
 while (getword2(word, MAXWORD) != EOF)
     {
     if (isalpha(word[0]))
-        {
-        if ((p = binsearch2(word, keytab, NKEYS)) != NULL)
+        if ((p = binsearch2(word, keytab, NKEYS)) == NULL)
             {
-            p->count++;
+            if (strlen(word) >= nameSize)
+                strncpy(buf, word, nameSize);
+            else
+                strcpy(buf,word);
+            root = addtree(root, buf);
             }
-        }
     }
-for (p = keytab; p < keytab + NKEYS; p++)
-    if (p->count > 0)
-        {
-        printf("%4d %s\n", p->count, p->word);
-        }
-return 0;
+treeprint(root);
 }

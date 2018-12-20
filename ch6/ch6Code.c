@@ -122,12 +122,42 @@ struct key keytab[] =
 };
 */
 
-// initialize globals for not looking for keywords
-int inStr = FALSE;
-int inUnderscore = FALSE;
-int singleLineComment = FALSE;
-int multiLineComment = FALSE;
-int inPreproc = FALSE;
+struct tnode *talloc()
+/* allocate storage for a tnode */
+{
+return (struct tnode *)malloc(sizeof(struct tnode));
+}
+
+void treeprint(struct tnode *p)
+/* print tree structure */
+{
+if (p != NULL)
+    {
+    treeprint(p->left);
+    printf("%4d %s\n", p->count, p->word);
+    treeprint(p->right);
+    }
+}
+
+struct tnode *addtree(struct tnode *p, char *word)
+/* add a  node with w, at or below p */
+{
+int cond;
+if (p == NULL)
+    {
+    p = talloc();
+    p->word = strdup(word);
+    p->count = 1;
+    p->left = p->right = NULL;
+    }
+else if((cond = strcmp(word, p->word)) == 0)
+    p->count++;
+else if (cond < 0)
+    p->left = addtree(p->left, word);
+else
+    p->right = addtree(p->right, word);
+return p;
+}
 
 int prevChar(char *word, char prev)
 /* check if previous character in word is prev */
@@ -217,6 +247,16 @@ else if (c == '#') //jump to end of line
     *w++ = '\0';
     return word[0];
     }
+else if (c == '*') // pointer
+    {
+    *w++ = '\0';
+    return word[0];
+    }
+else if (c == '(')
+    {
+    *w++ = '\0';
+    return word[0];
+    }
 for ( ; --lim > 0; w++)
     {
     if (!isalnum(*w = getch()))
@@ -224,7 +264,9 @@ for ( ; --lim > 0; w++)
         if (*w == '_')
             continue;
         else if (*w == EOF)
+            {
             return EOF;
+            }
         else
             {
             ungetch(*w);
@@ -254,6 +296,26 @@ while (low <= high)
         return mid;
     }
 return -1;
+}
+
+struct key *binsearch2(char *word, struct key *tab, int n)
+/* binsearch2: binsearch but with pointer to struct */
+{
+int cond;
+struct key *low = &tab[0];
+struct key *high = &tab[n];
+struct key *mid;
+while (low < high)
+    {
+    mid = low + (high - low) / 2;
+    if ((cond = strcmp(word, mid->word)) < 0)
+        high = mid;
+    else if (cond > 0)
+        low = mid + 1;
+    else
+        return mid;
+    }
+return NULL;
 }
 
 char buf[BUFSIZE]; // buffer for ungetch
