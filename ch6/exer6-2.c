@@ -12,25 +12,40 @@ struct key keytab[] =
     "unsigned" , 0,"void" , 0,    "volatile" , 0,"while" , 0
     };
 
-int main()
+int main(int argc, char *argv[])
 /* sort variable names that share the first 6 letters */
 {
 struct tnode *root;
 char word[MAXWORD];
-char buf[7];
+char param[MAXWORD];
+//char buf[];
 struct key *p;
-int nameSize;
+int nameSize = 6;
+int i;
 root = NULL;
+
+if (argc > 1 && (*++argv)[0] == '-')
+    {
+    for (i = 1; i < strlen(argv[0]); i++)
+        param[i-1] = argv[0][i];
+    param[i] = '\0';
+    nameSize = atoi(param);
+    }
+char buf[nameSize+1];
+
 while (getword2(word, MAXWORD) != EOF)
     {
     if (isalpha(word[0]))
         if ((p = binsearch2(word, keytab, NKEYS)) == NULL)
             {
-            if (strlen(word) >= nameSize)
+            if (strlen(word) > nameSize)
+                {
                 strncpy(buf, word, nameSize);
+                buf[nameSize] = '\0';
+                root = addtree(root, buf);
+                }
             else
-                strcpy(buf,word);
-            root = addtree(root, buf);
+                root = addtree(root, word);
             }
     }
 treeprint(root);
