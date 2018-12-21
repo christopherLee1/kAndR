@@ -4,17 +4,21 @@ FLAGS =
 DEPS = ch6Code.h
 OBJ1 = exer6-1.o ch6Code.o
 OBJ2 = exer6-2.o ch6Code.o
+OBJ3 = exer6-3.o ch6Code.o
 OBJFREQ = wordFreq.o ch6Code.o
 
 %.o : %.c $(DEPS)
 	$(CC) -c -o $@ $< $(FLAGS)
 
-all: exer6-1 exer6-2 wordFreq
+all: exer6-1 exer6-2 exer6-3 wordFreq
 
 exer6-1: $(OBJ1)
 	$(CC) -o $@ $^ $(FLAGS)
 
 exer6-2: $(OBJ2)
+	$(CC) -o $@ $^ $(FLAGS)
+
+exer6-3: $(OBJ3)
 	$(CC) -o $@ $^ $(FLAGS)
 
 wordFreq: $(OBJFREQ)
@@ -30,4 +34,4 @@ tags:
 clean:
 	@rm -f *.o
 	@rm -f exer6-1 ch6Code exer6-2 wordFreq
-	@rm -rf *.dSYM
+	@rm -rf *.dSYM tags

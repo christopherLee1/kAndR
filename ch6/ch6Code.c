@@ -159,6 +159,58 @@ else
 return p;
 }
 
+struct tnodeArray *tnodeArrayAlloc()
+/* allocate storage for a tnode */
+{
+return (struct tnodeArray *)malloc(sizeof(struct tnodeArray));
+}
+
+void treeArrayPrint(struct tnodeArray *p)
+/* print tree structure */
+{
+int i;
+if (p != NULL)
+    {
+    treeArrayPrint(p->left);
+    printf("%s: ", p->word);
+    if (p->count > 1)
+        {
+        for (i = 0; i < p->count; i++)
+            printf("%d, ", p->lineArray[i]);
+        printf("%d\n", p->lineArray[i]);
+        }
+    else
+        printf("%d\n", p->lineArray[0]);
+    treeArrayPrint(p->right);
+    }
+}
+
+struct tnodeArray *addTreeArray(struct tnodeArray *p, char *word, int lineNum)
+/* add a  node with w, at or below p */
+{
+//printf("adding new node (%s)\n", word);
+int cond;
+if (p == NULL)
+    {
+    p = tnodeArrayAlloc();
+    p->word = strdup(word);
+    p->count = 1;
+    p->lineArray[0] = lineNum;
+    p->left = p->right = NULL;
+    //printf("p->word = %s, p->count = %d, p->lineArray[0] = %d\n", p->word, p->count, p->lineArray[0]);
+    }
+else if((cond = strcmp(word, p->word)) == 0)
+    {
+    p->lineArray[p->count] = lineNum;
+    p->count++;
+    }
+else if (cond < 0)
+    p->left = addTreeArray(p->left, word, lineNum);
+else
+    p->right = addTreeArray(p->right, word, lineNum);
+return p;
+}
+
 int prevChar(char *word, char prev)
 /* check if previous character in word is prev */
 {
@@ -196,6 +248,56 @@ for (i = 0; i < len; ++i)
 return TRUE;
 }
 
+void afree(char *p) /* free storage pointed to by p */
+{
+if (p >= allocbuf && p < allocbuf + ALLOCSIZE)
+    allocp = p;
+}
+
+char *alloc(int n) /* return pointer to n characters */
+{
+if (allocbuf + ALLOCSIZE - allocp >= n) /* it fits */
+{
+    allocp += n;
+    return allocp - n; /* old p */
+} else /* not enough room */
+    return 0;
+}
+
+int getLine(char *s, int lim)
+/* getLine: read at most lim chars into s */
+{
+int c;
+char *p = s; // need this pointer so s still points to the beginning
+while (--lim > 0 && (c=getchar()) != EOF && c != '\n')
+    *p++ = c;
+if (c == '\n')
+    *p++ = c;
+*p = '\0';
+return p-s;
+}
+
+int readlines(char *lineptr[], int maxlines)
+/* readlines: read input lines */
+{
+    int len, nlines;
+    char *p, line[MAXCOUNT];
+
+    nlines = 0;
+    while ((len = getLine(line, MAXCOUNT)) > 0)
+        if (nlines >= maxlines || (p = alloc(len)) == NULL)
+            return -1;
+        else {
+            line[len-1] = '\0'; /* delete newline */
+            strcpy(p, line);
+            lineptr[nlines++] = p;
+        }
+    if (p != NULL)
+        //printf("freeing p\n");
+        afree(p);
+    return nlines;
+}
+
 int getword2 (char *word, int lim)
 /* better getword: get next word or character from input, and deal with underscores,
    string constants, comments and single line only preprocessor statements */
@@ -204,7 +306,12 @@ int c;
 char *w = word;
 
 while (isspace(c = getch()))
-    ;
+    if (c == '\n')
+        {
+        *w++ = '\0';
+        //printf("returning newline when word = %s\n", w);
+        return '\n';
+        }
 if (c != EOF)
     *w++ = c;
 if (c == '"') //jump to end of string
@@ -233,9 +340,12 @@ else if (c == '/') //check for comments
         *w++ = c;
         for (; --lim > 0; w++)
             if ((*w = getch()) == '*')
+                {
+                *w++;
                 if ((*w = getch()) == '/')
                     break;
-        *w++ = '\0';
+                }
+        *++w = '\0';
         return word[0];
         }
     }
