@@ -128,6 +128,32 @@ struct tnode *talloc()
 return (struct tnode *)malloc(sizeof(struct tnode));
 }
 
+struct tnode *copy(struct tnode *p)
+/* copy p into a new pointer */
+{
+struct tnode *copy = NULL;
+if (p != NULL)
+    {
+    copy = talloc();
+    copy->word = strdup(p->word);
+    copy->count = p->count;
+    copy->left = p->left;
+    copy->right = p->right;
+    }
+return copy;
+}
+
+void copyTree(struct tnode **array, int arraySize, int *elemPointer, struct tnode *p)
+/* copy elements from p into array */
+{
+if (p != NULL)
+    {
+    copyTree(array, arraySize, elemPointer, p->left);
+    array[(*elemPointer)++] = p;
+    copyTree(array, arraySize, elemPointer, p->right);
+    }
+}
+
 void treeprint(struct tnode *p)
 /* print tree structure */
 {
@@ -139,43 +165,25 @@ if (p != NULL)
     }
 }
 
-int treeCmp(const struct tnode *a, const struct tnode *b)
+int treeCmp(const void *elem1, const void *elem2)
 /* Comparison function for qsort */
 {
-return a->count - b->count;
+const struct tnode *a = *((struct tnode **)elem1);
+const struct tnode *b = *((struct tnode **)elem2);
+return (int)(a->count) - (int)(b->count);
 }
 
 void sortAndPrintTree(struct tnode *tree)
-/* make an array of pointers to nodes and then use qsort to sort the array */
+/* make an array of pointers to nodes and then use qsort to sort the array based on count */
 {
-/*
-struct tnode *begin = root;
+struct tnode *begin = tree;
+struct tnode *array[nodeCount];
+int i = 0;
 int arrayLen = 0;
-for (arrayLen = 0; root != NULL; root = root->left)
-    arrayLen++;
-*/
-}
-struct tree *addNodeToTree(struct tree *p, char *word)
-/* add a  node with word, at or below p */
-{
-int cond;
-if (p == NULL)
-    {
-    p->root = talloc();
-    p->root->word = strdup(word);
-    p->root->count = 1;
-    p->root->left = p->root->right = NULL;
-    p->count = 1;
-    }
-else if((cond = strcmp(word, p->root->word)) == 0)
-    {
-    p->root->count++;
-    }
-else if (cond < 0)
-    p->root->left = addtree(p->root->left, word);
-else
-    p->root->right = addtree(p->root->right, word);
-return p;
+copyTree(array, nodeCount, &arrayLen, tree);
+qsort(array, nodeCount, sizeof(array[0]), treeCmp);
+for (i = 0; i < arrayLen; i++)
+    printf("%d %s\n", array[i]->count, array[i]->word);
 }
 
 struct tnode *addtree(struct tnode *p, char *word)
@@ -188,6 +196,7 @@ if (p == NULL)
     p->word = strdup(word);
     p->count = 1;
     p->left = p->right = NULL;
+    nodeCount++;
     }
 else if((cond = strcmp(word, p->word)) == 0)
     {

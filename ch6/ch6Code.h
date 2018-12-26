@@ -13,12 +13,6 @@ struct key
     int count; // number of times word occurs
     };
 
-struct tree
-    {
-    int count; // number of nodes in tree
-    struct tnode *root; // root of tree
-    };
-
 struct tnode 
     {
     char *word; // pointer to text
@@ -38,6 +32,7 @@ struct tnodeArray
     };
 
 extern struct key keytab[];
+int nodeCount; /* number of nodes in tree */
 static char allocbuf[ALLOCSIZE]; /* storage for alloc */
 static char *allocp = allocbuf; /* next free position */
 
@@ -51,14 +46,20 @@ static char *allocp = allocbuf; /* next free position */
 struct tnode *talloc();
 /* allocate storage for a tnode */
 
+struct tnode *copy(struct tnode *p);
+/* copy p into a new pointer */
+
+void copyTree(struct tnode **array, int arraySize, int *elemPointer, struct tnode *p);
+/* copy elements from p into array */
+
 void treeprint(struct tnode *p);
 /* print tree structure */
 
+int treeCmp(const void *elem1, const void *elem2);
+/* Comparison function for qsort */
+
 void sortAndPrintTree(struct tnode *tree);
 /* make an array of pointers to nodes and then use qsort to sort the array */
-
-struct tree *addNodeToTree(struct tree *p, char *word);
-/* add a node with word, at or below p */
 
 struct tnode *addtree(struct tnode *p, char *word);
 /* add a  node with w, at or below p */
