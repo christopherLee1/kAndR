@@ -13,6 +13,12 @@ struct key
     int count; // number of times word occurs
     };
 
+struct tree
+    {
+    int count; // number of nodes in tree
+    struct tnode *root; // root of tree
+    };
+
 struct tnode 
     {
     char *word; // pointer to text
@@ -48,8 +54,17 @@ struct tnode *talloc();
 void treeprint(struct tnode *p);
 /* print tree structure */
 
+void sortAndPrintTree(struct tnode *tree);
+/* make an array of pointers to nodes and then use qsort to sort the array */
+
+struct tree *addNodeToTree(struct tree *p, char *word);
+/* add a node with word, at or below p */
+
 struct tnode *addtree(struct tnode *p, char *word);
 /* add a  node with w, at or below p */
+
+struct tnode *addtreeInOrder(struct tnode *p);
+/* add p to tree in sorted order */
 
 struct tnodeArray *tnodeArrayAlloc();
 /* allocate storage for a tnode */
@@ -81,7 +96,7 @@ int getLine(char *s, int lim);
 int readlines(char *lineptr[], int maxlines);
 /* readlines: read input lines */
 
-int getword2 (char *word, int lim);
+int getword2 (char *word, int lim, int *lineNum);
 /* better getword that ignores preprocessor statements,
 comments and _ in var names */
 

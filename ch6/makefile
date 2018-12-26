@@ -5,12 +5,13 @@ DEPS = ch6Code.h
 OBJ1 = exer6-1.o ch6Code.o
 OBJ2 = exer6-2.o ch6Code.o
 OBJ3 = exer6-3.o ch6Code.o
+OBJ4 = exer6-4.o ch6Code.o
 OBJFREQ = wordFreq.o ch6Code.o
 
 %.o : %.c $(DEPS)
 	$(CC) -c -o $@ $< $(FLAGS)
 
-all: exer6-1 exer6-2 exer6-3 wordFreq
+all: exer6-1 exer6-2 exer6-3 exer6-4 wordFreq tags
 
 exer6-1: $(OBJ1)
 	$(CC) -o $@ $^ $(FLAGS)
@@ -19,6 +20,9 @@ exer6-2: $(OBJ2)
 	$(CC) -o $@ $^ $(FLAGS)
 
 exer6-3: $(OBJ3)
+	$(CC) -o $@ $^ $(FLAGS)
+
+exer6-4: $(OBJ4)
 	$(CC) -o $@ $^ $(FLAGS)
 
 wordFreq: $(OBJFREQ)

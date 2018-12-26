@@ -139,8 +139,47 @@ if (p != NULL)
     }
 }
 
+int treeCmp(const struct tnode *a, const struct tnode *b)
+/* Comparison function for qsort */
+{
+return a->count - b->count;
+}
+
+void sortAndPrintTree(struct tnode *tree)
+/* make an array of pointers to nodes and then use qsort to sort the array */
+{
+/*
+struct tnode *begin = root;
+int arrayLen = 0;
+for (arrayLen = 0; root != NULL; root = root->left)
+    arrayLen++;
+*/
+}
+struct tree *addNodeToTree(struct tree *p, char *word)
+/* add a  node with word, at or below p */
+{
+int cond;
+if (p == NULL)
+    {
+    p->root = talloc();
+    p->root->word = strdup(word);
+    p->root->count = 1;
+    p->root->left = p->root->right = NULL;
+    p->count = 1;
+    }
+else if((cond = strcmp(word, p->root->word)) == 0)
+    {
+    p->root->count++;
+    }
+else if (cond < 0)
+    p->root->left = addtree(p->root->left, word);
+else
+    p->root->right = addtree(p->root->right, word);
+return p;
+}
+
 struct tnode *addtree(struct tnode *p, char *word)
-/* add a  node with w, at or below p */
+/* add a  node with word, at or below p */
 {
 int cond;
 if (p == NULL)
@@ -151,7 +190,9 @@ if (p == NULL)
     p->left = p->right = NULL;
     }
 else if((cond = strcmp(word, p->word)) == 0)
+    {
     p->count++;
+    }
 else if (cond < 0)
     p->left = addtree(p->left, word);
 else
@@ -175,7 +216,7 @@ if (p != NULL)
     printf("%s: ", p->word);
     if (p->count > 1)
         {
-        for (i = 0; i < p->count; i++)
+        for (i = 0; i < p->count-1; i++)
             printf("%d, ", p->lineArray[i]);
         printf("%d\n", p->lineArray[i]);
         }
@@ -188,7 +229,6 @@ if (p != NULL)
 struct tnodeArray *addTreeArray(struct tnodeArray *p, char *word, int lineNum)
 /* add a  node with w, at or below p */
 {
-//printf("adding new node (%s)\n", word);
 int cond;
 if (p == NULL)
     {
@@ -197,7 +237,6 @@ if (p == NULL)
     p->count = 1;
     p->lineArray[0] = lineNum;
     p->left = p->right = NULL;
-    //printf("p->word = %s, p->count = %d, p->lineArray[0] = %d\n", p->word, p->count, p->lineArray[0]);
     }
 else if((cond = strcmp(word, p->word)) == 0)
     {
@@ -298,7 +337,7 @@ int readlines(char *lineptr[], int maxlines)
     return nlines;
 }
 
-int getword2 (char *word, int lim)
+int getword2 (char *word, int lim, int *lineNum)
 /* better getword: get next word or character from input, and deal with underscores,
    string constants, comments and single line only preprocessor statements */
 {
@@ -309,7 +348,7 @@ while (isspace(c = getch()))
     if (c == '\n')
         {
         *w++ = '\0';
-        //printf("returning newline when word = %s\n", w);
+        ++(*lineNum);
         return '\n';
         }
 if (c != EOF)
@@ -319,7 +358,10 @@ if (c == '"') //jump to end of string
     for (; --lim > 0; w++)
         if ((*w = getch()) == '"')
             {
-            *++w = '\0';
+            w++;
+            if ((*w = getch()) == '\n')
+                ++(*lineNum);
+            *w++ = '\0';
             return word[0];
             }
     }
@@ -331,7 +373,10 @@ else if (c == '/') //check for comments
         *w++ = c;
         for (; --lim > 0; w++)
             if ((*w = getch()) == '\n')
+                {
+                ++(*lineNum);
                 break;
+                }
         *w++ = '\0';
         return word[0];
         }
@@ -339,13 +384,20 @@ else if (c == '/') //check for comments
         {
         *w++ = c;
         for (; --lim > 0; w++)
-            if ((*w = getch()) == '*')
+            {
+            if ((*w = getch()) == '\n')
+                ++(*lineNum);
+            if (*w == '*')
                 {
-                *w++;
+                w++;
                 if ((*w = getch()) == '/')
                     break;
                 }
-        *++w = '\0';
+            w++;
+            if ((*w = getch()) == '\n')
+                ++(*lineNum);
+            }
+        *w++ = '\0';
         return word[0];
         }
     }
@@ -353,7 +405,10 @@ else if (c == '#') //jump to end of line
     {
     for (; --lim > 0; w++)
         if ((*w = getch()) == '\n')
+            {
+            ++(*lineNum);
             break;
+            }
     *w++ = '\0';
     return word[0];
     }

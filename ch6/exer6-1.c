@@ -17,8 +17,9 @@ int main()
 struct key *p;
 char word[MAXWORD];
 int sum = 0;
+int lineNum = 0;
 
-while (getword2(word, MAXWORD) != EOF)
+while (getword2(word, MAXWORD, &lineNum) != EOF)
     {
     if (isalpha(word[0]))
         {

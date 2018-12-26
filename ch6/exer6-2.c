@@ -22,6 +22,7 @@ char param[MAXWORD];
 struct key *p;
 int nameSize = 6;
 int i;
+int lineNum = 0;
 root = NULL;
 
 if (argc > 1 && (*++argv)[0] == '-')
@@ -33,7 +34,7 @@ if (argc > 1 && (*++argv)[0] == '-')
     }
 char buf[nameSize+1];
 
-while (getword2(word, MAXWORD) != EOF)
+while (getword2(word, MAXWORD, &lineNum) != EOF)
     {
     if (isalpha(word[0]))
         if ((p = binsearch2(word, keytab, NKEYS)) == NULL)

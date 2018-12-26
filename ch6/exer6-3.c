@@ -17,24 +17,12 @@ int i;
 int c;
 root = NULL;
 
-while ((c = getword2(word, MAXWORD)) != EOF)
+while ((c = getword2(word, MAXWORD, &lineNum)) != EOF)
     {
-    /*
-    if (c == EOF)
-        {
-        printf("c = EOF\n");
-        break;
-        }
-    */
-    //printf("word = (%s)\n", word);
-    if (c == '\n')
-        lineNum++;
-    else if (isalpha(word[0]))
+    if (isalpha(word[0]))
         {
         root = addTreeArray(root, word, lineNum);
         }
     }
-printf("done reading input");
-printf("root->word = %s, root->array[0] = %d\n", root->word, root->lineArray[0]);
 treeArrayPrint(root);
 }
