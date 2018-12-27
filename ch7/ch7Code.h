@@ -7,8 +7,8 @@
 #define TRUE 1
 #define FALSE 0
 
-#define MAXCHARSTOREAD 200 // don't read in more than 200 chars at once
-#define MAXLINEWIDTH 80 // "pretty print" line size
+#define MAXLINEWIDTH 80
+#define MAXSIZE 100
 
 char *getProgName(char *s);
 /* return name of invoked program with trimed off path */
@@ -24,3 +24,6 @@ void minprintf(char *fmt, ...);
 
 void minscanf(char *fmt, ...);
 /* minimal scanf with variable argument list */
+
+int getLine(char *line, int max, FILE *fp);
+/* read in max chars from fp */
