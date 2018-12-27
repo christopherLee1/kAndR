@@ -1,10 +1,5 @@
 #include "ch7Code.h"
 
-void zeroString(char *s, int len)
-/* null all chars of string */
-{
-memset(s, 0, len);
-}
 
 int main(int argc, char *argv[])
 /* wrap lines over 80 chars */

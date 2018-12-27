@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -10,3 +12,12 @@
 
 char *getProgName(char *s);
 /* return name of invoked program with trimed off path */
+
+void zeroString(char *s, int len);
+/* null all chars of string */
+
+void minprintfrevised(char *fmt, ...);
+/* revised minimal printf to handle more printf features */
+
+void minprintf(char *fmt, ...);
+/* minimal printf with variable argument list */
