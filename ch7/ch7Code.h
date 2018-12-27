@@ -21,3 +21,6 @@ void minprintfrevised(char *fmt, ...);
 
 void minprintf(char *fmt, ...);
 /* minimal printf with variable argument list */
+
+void minscanf(char *fmt, ...);
+/* minimal scanf with variable argument list */

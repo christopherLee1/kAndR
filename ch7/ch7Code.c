@@ -1,3 +1,20 @@
+/*
+Calculator from chapter 4 rewritten with scanf:
+
+#include <stdio.h>
+main()
+{
+double sum, v;
+sum = 0;
+while (scanf("%lf", &v) == 1)
+    printf("\t%.2f\n", sum+= v);
+return 0
+}
+
+read a datestring with scanf:
+int day, month, year;
+scanf("%d/%d/%d", &month, &day, &year); // 11/27/1909
+*/
 #include "ch7Code.h"
 
 char *getProgName(char *s)
@@ -129,6 +146,45 @@ for (p = fmt; *p; p++)
             break;
         default:
             putchar(*p);
+            break;
+        }
+    }
+va_end(ap); // clean up when done
+}
+
+void minscanf(char *fmt, ...)
+/* minimal scanf with variable argument list */
+{
+va_list ap; // points to unnamed arg in turn
+char *p, *sval;
+int c;
+int *ival;
+double *dval;
+
+va_start(ap, fmt); // make ap point to first unnamed arg
+for (p = fmt; *p; p++)
+    {
+    if (*p != '%')
+        {
+        //getchar();
+        continue;
+        }
+    switch(*++p)
+        {
+        case 'd':
+            ival = va_arg(ap, int *);
+            scanf("%d", ival);
+            break;
+        case 'f':
+            dval = va_arg(ap, double *);
+            scanf("%f", dval);
+            break;
+        case 's':
+            sval = va_arg(ap, char *);
+            scanf("%s", sval);
+            break;
+        default:
+            getchar();
             break;
         }
     }
