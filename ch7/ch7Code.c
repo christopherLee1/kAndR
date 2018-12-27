@@ -195,7 +195,9 @@ int getLine(char *line, int max, FILE *fp)
 /* read in max chars from fp */
 {
 if (fgets(line, max, fp) == NULL)
+    {
     return 0;
+    }
 else
     return strlen(line);
 }
