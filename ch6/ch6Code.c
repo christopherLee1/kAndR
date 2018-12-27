@@ -122,6 +122,71 @@ struct key keytab[] =
 };
 */
 
+unsigned hash(char *s)
+/* form the hash value for the string s */
+{
+unsigned hashval;
+for (hashval = 0; *s != '\0'; s++)
+    hashval = *s + 31 * hashval;
+return hashval % HASHSIZE;
+}
+
+struct nlist *lookup(char *s)
+/* look for s in hashtab */
+{
+struct nlist *np;
+for (np = hashtab[hash(s)]; np != NULL; np = np->next)
+    if (strcmp(s, np->name) == 0)
+        return np;
+return NULL;
+}
+
+struct nlist *install(char *name, char *defn)
+/* put (name, defn) in hashtab */
+{
+struct nlist *np;
+unsigned hashval;
+if ((np = lookup(name)) == NULL)
+    {
+    np = (struct nlist *)malloc(sizeof(*np));
+    if (np == NULL || (np->name = strdup(name)) == NULL)
+        return NULL;
+    hashval = hash(name);
+    np->next = hashtab[hashval];
+    hashtab[hashval] = np;
+    }
+else
+    free((void *) np->defn);
+if ((np->defn = strdup(defn)) == NULL)
+    return NULL;
+return np;
+}
+
+void undef(char *name)
+/* remove defn pointed to by name */
+{
+if (lookup(name))
+    {
+    unsigned hashval = hash(name);
+    hashtab[hashval] = NULL;
+    }
+}
+
+void printHash()
+/* print name,val pairs in hash */
+{
+int i;
+for (i = 0; i < HASHSIZE; i++)
+    {
+    if (hashtab[i] != NULL)
+        {
+        struct nlist *tmp = hashtab[i];
+        for (tmp; tmp != NULL; tmp = tmp->next)
+            printf("%s,%s\n", tmp->name, tmp->defn);
+        }
+    }
+}
+
 struct tnode *talloc()
 /* allocate storage for a tnode */
 {
@@ -312,15 +377,31 @@ if (allocbuf + ALLOCSIZE - allocp >= n) /* it fits */
     return 0;
 }
 
+void splitStringBySpaces(char *in, char **out, int size)
+/* Split in by spaces into at most size strings */
+{
+int i = 0;
+if (in != NULL)
+    {
+    int len = strlen(in);
+    int ix = 0;
+    char *tmpStr;
+    while(ix < size && ((tmpStr = strsep(&in, " \t")) != NULL))
+        {
+        out[ix++] = strdup(tmpStr);
+        }
+    }
+}
+
 int getLine(char *s, int lim)
-/* getLine: read at most lim chars into s */
+/* getLine: read at most lim chars into s, exclude newline char*/
 {
 int c;
 char *p = s; // need this pointer so s still points to the beginning
 while (--lim > 0 && (c=getchar()) != EOF && c != '\n')
     *p++ = c;
-if (c == '\n')
-    *p++ = c;
+if (c == EOF)
+    return EOF;
 *p = '\0';
 return p-s;
 }

@@ -6,6 +6,14 @@
 #define MAXWORD 100
 #define MAXCOUNT 100 // number of times a word can appear in a document
 #define ALLOCSIZE 100
+#define HASHSIZE 101
+
+struct nlist
+    {
+    struct nlist *next; /* next entry in chain */
+    char *name; /* defined name */
+    char *defn; /* replacement name */
+    };
 
 struct key
     {
@@ -35,6 +43,7 @@ extern struct key keytab[];
 int nodeCount; /* number of nodes in tree */
 static char allocbuf[ALLOCSIZE]; /* storage for alloc */
 static char *allocp = allocbuf; /* next free position */
+static struct nlist *hashtab[HASHSIZE]; /* pointer to hash table */
 
 #define TRUE 1
 #define FALSE 0
@@ -42,6 +51,21 @@ static char *allocp = allocbuf; /* next free position */
 #define NKEYS (sizeof keytab / sizeof keytab[0])
 
 #define BUFSIZE 100
+
+unsigned hash(char *s);
+/* form the hash value for the string s */
+
+struct nlist *lookup(char *s);
+/* look for s in hashtab */
+
+struct nlist *install(char *name, char *defn);
+/* put (name, defn) in hashtab */
+
+void undef(char *name);
+/* remove defn pointed to by name */
+
+void printHash();
+/* print name,val pairs in hash */
 
 struct tnode *talloc();
 /* allocate storage for a tnode */
@@ -90,6 +114,9 @@ void afree(char *p);
 
 char *alloc(int n);
 /* return pointer to n characters */
+
+void splitStringBySpaces(char *in, char **out, int size);
+/* Split in by spaces into at most size strings */
 
 int getLine(char *s, int lim);
 /* getLine: read at most lim chars into s */
