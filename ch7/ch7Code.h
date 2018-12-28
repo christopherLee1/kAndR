@@ -9,6 +9,7 @@
 
 #define MAXLINEWIDTH 80
 #define MAXSIZE 100
+#define PAGESIZE 10
 
 char *getProgName(char *s);
 /* return name of invoked program with trimed off path */
