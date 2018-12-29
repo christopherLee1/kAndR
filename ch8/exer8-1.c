@@ -4,8 +4,8 @@ void filecopy(int ifp, int ofp)
 /* copy file ifp to file ofp */
 {
 int c;
-char buf[BUFSIZE];
-while ((c = read(ifp, buf, BUFSIZE)) > 0)
+char buf[_BUFSIZE];
+while ((c = read(ifp, buf, _BUFSIZE)) > 0)
     write(ofp, buf, c);
 }
 
