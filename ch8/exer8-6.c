@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 /*  test of _calloc */
 {
 int i;
+printf("calling calloc with (5, %lu)\n", sizeof(char)*6);
 char **nameArray = _calloc(5, sizeof(char) * 6); // 5 array elements that can hold "chris" plus null
 for (i = 0; i < 5; i++)
     nameArray[i] = "chris";

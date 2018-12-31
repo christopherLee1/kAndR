@@ -402,9 +402,13 @@ void *_malloc(unsigned nbytes)
 /* general purpose storage allocator */
 {
 Header *p, *prevp;
-unsigned nunits;
+unsigned nunits, reqSize;
 
-nunits = (nbytes * sizeof(Header)-1)/sizeof(Header) + 1;
+nunits = (nbytes + sizeof(Header)-1)/ sizeof(Header) + 1;
+reqSize = (nbytes >  NALLOC ? nbytes : NALLOC);
+if (reqSize + curr_alloc > MAX_ALLOC)
+    error("_malloc: trying to allocate more than %lu bytes", MAX_ALLOC);
+
 if ((prevp = freep) == NULL) // no free list yet
     {
     base.s.ptr = freep = prevp = &base;
@@ -423,11 +427,14 @@ for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr)
             p->s.size = nunits;
             }
         freep = prevp;
+        curr_alloc += reqSize;
         return (void *)(p+1);
         }
     if (p == freep) // wrapped around free list
+        {
         if ((p = morecore(nunits)) == NULL)
             return NULL; // none left
+        }
     }
 }
 
@@ -452,13 +459,20 @@ void _free(void *ap)
 {
 Header *bp, *p;
 bp = (Header *)ap - 1; // point to block header
+if (bp == NULL)
+    {
+    error("_free: trying to free NULL block");
+    }
+if (bp->s.size < sizeof(Header))
+    error("_free: trying to free corrupted header");
+
 for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
     {
     if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
-        break;
+        break; // freed block at start or end of arena
     }
 
-if (bp + bp->s.size == p->s.ptr)
+if (bp + bp->s.size == p->s.ptr) // join to upper neighbor
     {
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
@@ -466,7 +480,7 @@ if (bp + bp->s.size == p->s.ptr)
 else
     bp->s.ptr = p->s.ptr;
 
-if (p + p->s.size == bp)
+if (p + p->s.size == bp) // join to lower neighbor
     {
     p->s.size += bp->s.size;
     p->s.ptr = bp->s.ptr;
@@ -475,4 +489,10 @@ else
     p->s.ptr = bp;
 
 freep = p;
+}
+
+void bfree(void *p, unsigned size)
+/* Add arbitrary block p of size chars into free list */
+// isn't this the same as _calloc?
+{
 }

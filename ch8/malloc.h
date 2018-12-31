@@ -13,3 +13,4 @@ union header
 typedef union header Header;
 
 #define NALLOC 1024
+#define MAX_ALLOC 1024*1024 // 1Mb

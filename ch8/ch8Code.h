@@ -11,6 +11,7 @@
 
 static Header base; // empty list for start of malloc
 static Header *freep = NULL; // start of free list
+static long curr_alloc = 0;
 
 //#define BUFSIZE 1024
 
@@ -77,3 +78,6 @@ Header *morecore(unsigned nbytes);
 
 void _free(void *ap);
 /* put block ap in free list */
+
+void bfree(void *p, unsigned size);
+/* Free arbitrary block p of size characters */
