@@ -67,7 +67,7 @@ lseek(fd, 0L, 2);
 to get back to beginning:
 lseek(fd, 0L, 0);
 lseek returns new position in file or -1 if error occurs
-fseek is similar to lseek byt first arg is FILE* and returns non-zero on error
+fseek is similar to lseek but first arg is FILE* and returns non-zero on error
 */
 
 int _get(int fd, long pos, char *buf, int n)
@@ -276,4 +276,21 @@ fp->flag = 0;
 fp->base = fp->ptr = _NULL;
 fp->cnt = 0;
 return x;
+}
+
+int _fseek(_FILE *fp, long offset, int origin)
+/* Position fp->buf and fp->ptr to offset and origin.
+fp should be an already opened file. */
+{
+int n;
+if ((fp->flag & _UNBUF) == 0 && fp->base != _NULL)
+    if ((fp->flag & _WRITE) == _WRITE)
+        _fflush(fp);
+    else if (fp->flag && _READ)
+        {
+        fp->cnt = 0;
+        fp->ptr = fp->base;
+        }
+n = lseek(fp->fd, offset, origin);
+return n;
 }

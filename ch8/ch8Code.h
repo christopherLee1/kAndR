@@ -25,3 +25,22 @@ _FILE * _fopen1(char *name, char *mode);
 
 _FILE * _fopen2(char *name, char *mode);
 /* open file, return file ptr, uses fields instead enum */
+
+int _fillbuf2(_FILE *fp);
+/* allocate and fill input buffer, use flags_field instead of enum */
+
+int _fillbuf(_FILE *fp);
+/* allocate and fill input buffer */
+
+int _flushbuf(int x, _FILE *fp);
+/* write current buffer to fp->fd */
+
+int _fflush(_FILE *fp);
+/* write fp buffer to fd, pass along any errors */
+
+int _fclose(_FILE *fp);
+/* close file descriptor */
+
+int _fseek(_FILE *fp, long offset, int origin);
+/* Position fp->buf and fp->ptr to offset and origin.
+fp should be an already opened file. */
