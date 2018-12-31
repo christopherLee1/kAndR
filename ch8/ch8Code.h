@@ -7,6 +7,10 @@
 #include <time.h>
 #include "my_stdio.h"
 #include "dirent.h"
+#include "malloc.h"
+
+static Header base; // empty list for start of malloc
+static Header *freep = NULL; // start of free list
 
 //#define BUFSIZE 1024
 
@@ -61,3 +65,15 @@ void _closedir(_DIR *dp);
 
 _Dirent *_readdir(_DIR *dp);
 /* read directory entry in sequence */
+
+void *_calloc(unsigned n, unsigned nsize);
+/* initialize n objects of size nsize */
+
+void *_malloc(unsigned nbytes);
+/* general purpose storage allocator */
+
+Header *morecore(unsigned nbytes);
+/* ask system for more memory */
+
+void _free(void *ap);
+/* put block ap in free list */

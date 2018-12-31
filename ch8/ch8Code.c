@@ -387,3 +387,92 @@ while (read(dp->fd, (char *)&dirbuf, sizeof(dirbuf)) == sizeof(dirbuf))
     }
 return NULL;
 }
+
+void *_calloc(unsigned count, unsigned nsize)
+/* initialize count objects of size nsize */
+{
+unsigned reqSize = count * nsize;
+void *ret = _malloc(reqSize);
+if (ret != NULL)
+    memset(ret, 0, reqSize);
+return ret;
+}
+
+void *_malloc(unsigned nbytes)
+/* general purpose storage allocator */
+{
+Header *p, *prevp;
+unsigned nunits;
+
+nunits = (nbytes * sizeof(Header)-1)/sizeof(Header) + 1;
+if ((prevp = freep) == NULL) // no free list yet
+    {
+    base.s.ptr = freep = prevp = &base;
+    base.s.size = 0;
+    }
+for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr)
+    {
+    if (p->s.size >= nunits) // big enough
+        {
+        if (p->s.size == nunits) // exactly big enough
+            prevp->s.ptr = p->s.ptr;
+        else
+            {
+            p->s.size -= nunits;
+            p += p->s.size;
+            p->s.size = nunits;
+            }
+        freep = prevp;
+        return (void *)(p+1);
+        }
+    if (p == freep) // wrapped around free list
+        if ((p = morecore(nunits)) == NULL)
+            return NULL; // none left
+    }
+}
+
+Header *morecore(unsigned nbytes)
+/* ask system for more memory */
+{
+char *cp;
+Header *up;
+if (nbytes < NALLOC)
+    nbytes = NALLOC;
+cp = sbrk(nbytes * sizeof(Header));
+if (cp == (char *) -1) // no space
+    return NULL;
+up = (Header *)cp;
+up->s.size = nbytes;
+_free((void *)(up+1));
+return freep;
+}
+
+void _free(void *ap)
+/* put block ap in free list */
+{
+Header *bp, *p;
+bp = (Header *)ap - 1; // point to block header
+for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
+    {
+    if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
+        break;
+    }
+
+if (bp + bp->s.size == p->s.ptr)
+    {
+    bp->s.size += p->s.ptr->s.size;
+    bp->s.ptr = p->s.ptr->s.ptr;
+    }
+else
+    bp->s.ptr = p->s.ptr;
+
+if (p + p->s.size == bp)
+    {
+    p->s.size += bp->s.size;
+    p->s.ptr = bp->s.ptr;
+    }
+else
+    p->s.ptr = bp;
+
+freep = p;
+}
