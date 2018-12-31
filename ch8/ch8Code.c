@@ -294,3 +294,96 @@ if ((fp->flag & _UNBUF) == 0 && fp->base != _NULL)
 n = lseek(fp->fd, offset, origin);
 return n;
 }
+
+void fsize(char *name)
+/* print size of file "name" */
+{
+struct stat stbuf;
+char at_buf[1024]; // for atime string
+struct tm *atime;
+
+if (stat(name, &stbuf) == -1)
+    {
+    fprintf(stderr, "fsize: cant't access %s\n", name);
+    return;
+    }
+if ((stbuf.st_mode & S_IFMT) == S_IFDIR)
+    dirwalk(name, fsize);
+atime = localtime(&(stbuf.st_atime));
+strftime(at_buf, sizeof(at_buf), "%d %B %Y", atime);
+printf("%18d %s %s\n", stbuf.st_size, at_buf, name);
+}
+
+#define MAXPATH 1024
+
+void dirwalk(char *dir, void(*fcn)(char *))
+/* apply fcn to all files in dir */
+{
+char name[MAXPATH];
+_Dirent *dp;
+_DIR *dfd;
+
+if ((dfd = _opendir(dir)) == NULL)
+    {
+    fprintf(stderr, "dirwalk: can't open %s\n", dir);
+    return;
+    }
+while ((dp = _readdir(dfd)) != NULL)
+    {
+    if (strcmp(dp->name, ".") == 0 ||
+        strcmp(dp->name, "..") == 0)
+        continue;
+    if (strlen(dir)+strlen(dp->name)+2 > sizeof(name))
+        fprintf(stderr, "dirwalk: name %s/%s too long\n", dir, dp->name);
+    else
+        {
+        sprintf(name, "%s/%s", dir, dp->name);
+        (*fcn)(name);
+        }
+    }
+    _closedir(dfd);
+}
+
+_DIR *_opendir(char *dname)
+/* open a directory for readdir calls */
+{
+int fd;
+struct stat stbuf;
+_DIR *dp;
+
+if ((fd = open(dname, O_RDONLY)) == -1
+    || fstat(fd, &stbuf) == -1
+    || (stbuf.st_mode & S_IFMT) != S_IFDIR
+    || (dp = (_DIR *) malloc(sizeof(_DIR))) == NULL)
+    return NULL;
+dp->fd = fd;
+return dp;
+}
+
+void _closedir(_DIR *dp)
+/* close directory opened by _opendir */
+{
+if (dp)
+    {
+    close(dp->fd);
+    free(dp);
+    }
+}
+
+_Dirent *_readdir(_DIR *dp)
+/* read directory entry in sequence */
+{
+struct _direct dirbuf;
+static _Dirent d;
+
+while (read(dp->fd, (char *)&dirbuf, sizeof(dirbuf)) == sizeof(dirbuf))
+    {
+    if (dirbuf.d_ino == 0)
+        continue;
+    d.ino = dirbuf.d_ino;
+    strncpy(d.name, dirbuf.d_name, DIRSIZ);
+    d.name[DIRSIZ] = '\0';
+    return &d;
+    }
+return NULL;
+}

@@ -4,7 +4,9 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <time.h>
 #include "my_stdio.h"
+#include "dirent.h"
 
 //#define BUFSIZE 1024
 
@@ -44,3 +46,18 @@ int _fclose(_FILE *fp);
 int _fseek(_FILE *fp, long offset, int origin);
 /* Position fp->buf and fp->ptr to offset and origin.
 fp should be an already opened file. */
+
+void fsize(char *name);
+/* print size of file "name" */
+
+_DIR *_opendir(char *dname);
+/* open a directory for readdir calls */
+
+void dirwalk(char *dir, void(*fcn)(char *));
+/* apply fcn to all files in dir */
+
+void _closedir(_DIR *dp);
+/* close directory opened by _opendir */
+
+_Dirent *_readdir(_DIR *dp);
+/* read directory entry in sequence */
